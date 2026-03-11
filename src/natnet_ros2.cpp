@@ -270,7 +270,7 @@ void NatNetNode::get_info()
     }
     else
     {
-        RCLCPP_INFO(get_logger(),"Received %d Data/Devices Descriptions:", pDataDefs->nDataDescriptions );
+        RCLCPP_INFO(get_logger(),"Received %d Data/Devices Descriptions:", pDataDefs->nDataDescriptions);
 
         for(int i=0; i < pDataDefs->nDataDescriptions; i++)
         {
@@ -285,11 +285,11 @@ void NatNetNode::get_info()
                 
                 // Creating publisher for the rigid bodies if found any
                 std::string body_name(pRB->szName);
-                if(pub_rigid_body)
-                {
-                    ListRigidBodies[pRB->ID] = body_name;
-                    RigidbodyPub[pRB->szName] = create_publisher<geometry_msgs::msg::PoseStamped>(body_name+"/pose", rclcpp::QoS(1000));
-                }
+                // if(pub_rigid_body)
+                // {
+                //     ListRigidBodies[pRB->ID] = body_name;
+                //     RigidbodyPub[pRB->szName] = create_publisher<geometry_msgs::msg::PoseStamped>(body_name+"/pose", rclcpp::QoS(1000));
+                // }
                 if ( pRB->MarkerPositions != NULL && pRB->MarkerRequiredLabels != NULL )
                 {
                     for ( int markerIdx = 0; markerIdx < pRB->nMarkers; ++markerIdx )
@@ -417,30 +417,34 @@ void NatNetNode::process_frame(sFrameOfMocapData* data)
 
 void NatNetNode::process_rigid_body(sRigidBodyData &data)
 {
-    geometry_msgs::msg::PoseStamped msgRigidBodyPose;
-    msgRigidBodyPose.header.frame_id = global_frame;
-    msgRigidBodyPose.header.stamp = remove_latency ? this->get_clock()->now()-frame_delay : this->get_clock()->now();
-    msgRigidBodyPose.pose.position.x = data.x;
-    msgRigidBodyPose.pose.position.y = data.y;
-    msgRigidBodyPose.pose.position.z = data.z;
-    msgRigidBodyPose.pose.orientation.x = data.qx;
-    msgRigidBodyPose.pose.orientation.y = data.qy;
-    msgRigidBodyPose.pose.orientation.z = data.qz;
-    msgRigidBodyPose.pose.orientation.w = data.qw;
-    RigidbodyPub[ListRigidBodies[data.ID]]->publish(msgRigidBodyPose);
-    // creating tf frame to visualize in the rviz
-    geometry_msgs::msg::TransformStamped msgTFRigidBodies;
-    msgTFRigidBodies.header.stamp = remove_latency ? this->get_clock()->now()-frame_delay : this->get_clock()->now();
-    msgTFRigidBodies.header.frame_id = global_frame;
-    msgTFRigidBodies.child_frame_id = ListRigidBodies[data.ID];
-    msgTFRigidBodies.transform.translation.x = data.x;
-    msgTFRigidBodies.transform.translation.y = data.y;
-    msgTFRigidBodies.transform.translation.z = data.z;
-    msgTFRigidBodies.transform.rotation.x = data.qx;
-    msgTFRigidBodies.transform.rotation.y = data.qy;
-    msgTFRigidBodies.transform.rotation.z = data.qz;
-    msgTFRigidBodies.transform.rotation.w = data.qw;
-    tfBroadcaster->sendTransform(msgTFRigidBodies);
+    if (data.params & 0x01) // check if the rigid body is tracked
+    {
+        // geometry_msgs::msg::PoseStamped msgRigidBodyPose;
+        // msgRigidBodyPose.header.frame_id = global_frame;
+        // msgRigidBodyPose.header.stamp = remove_latency ? this->get_clock()->now()-frame_delay : this->get_clock()->now();
+        // msgRigidBodyPose.pose.position.x = data.x;
+        // msgRigidBodyPose.pose.position.y = data.y;
+        // msgRigidBodyPose.pose.position.z = data.z;
+        // msgRigidBodyPose.pose.orientation.x = data.qx;
+        // msgRigidBodyPose.pose.orientation.y = data.qy;
+        // msgRigidBodyPose.pose.orientation.z = data.qz;
+        // msgRigidBodyPose.pose.orientation.w = data.qw;
+        // RigidbodyPub[ListRigidBodies[data.ID]]->publish(msgRigidBodyPose);
+
+        // creating tf frame to visualize in the rviz
+        geometry_msgs::msg::TransformStamped msgTFRigidBodies;
+        msgTFRigidBodies.header.stamp = remove_latency ? this->get_clock()->now()-frame_delay : this->get_clock()->now();
+        msgTFRigidBodies.header.frame_id = global_frame;
+        msgTFRigidBodies.child_frame_id = ListRigidBodies[data.ID];
+        msgTFRigidBodies.transform.translation.x = data.x;
+        msgTFRigidBodies.transform.translation.y = data.y;
+        msgTFRigidBodies.transform.translation.z = data.z;
+        msgTFRigidBodies.transform.rotation.x = data.qx;
+        msgTFRigidBodies.transform.rotation.y = data.qy;
+        msgTFRigidBodies.transform.rotation.z = data.qz;
+        msgTFRigidBodies.transform.rotation.w = data.qw;
+        tfBroadcaster->sendTransform(msgTFRigidBodies);
+    }
 }
 
 void NatNetNode::process_individual_marker(sMarker &data)

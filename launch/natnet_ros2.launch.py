@@ -97,15 +97,15 @@ def node_fn(context,*args, **kwargs):
 def generate_launch_description():
 
     return  LaunchDescription([
-        DeclareLaunchArgument('serverIP', default_value="192.168.0.100"),
-        DeclareLaunchArgument('clientIP', default_value="192.168.0.103"),
+        DeclareLaunchArgument('serverIP', default_value="192.168.0.24"),
+        DeclareLaunchArgument('clientIP', default_value="192.168.0.49"),
         DeclareLaunchArgument('serverType', default_value="multicast"), # multicast/unicast
         DeclareLaunchArgument('multicastAddress', default_value="239.255.42.99"),
         DeclareLaunchArgument('serverCommandPort', default_value="1510"),
         DeclareLaunchArgument('serverDataPort', default_value="1511"),
         DeclareLaunchArgument('global_frame', default_value="world"),
         DeclareLaunchArgument('remove_latency',default_value="false"),
-        DeclareLaunchArgument('pub_rigid_body', default_value="false"),
+        DeclareLaunchArgument('pub_rigid_body', default_value="true"),
         DeclareLaunchArgument('pub_rigid_body_marker', default_value="False"),
         DeclareLaunchArgument('pub_individual_marker', default_value="False"),
         DeclareLaunchArgument('pub_pointcloud', default_value="False"),
