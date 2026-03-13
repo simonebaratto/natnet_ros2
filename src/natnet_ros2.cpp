@@ -285,11 +285,11 @@ void NatNetNode::get_info()
                 
                 // Creating publisher for the rigid bodies if found any
                 std::string body_name(pRB->szName);
-                // if(pub_rigid_body)
-                // {
-                //     ListRigidBodies[pRB->ID] = body_name;
-                //     RigidbodyPub[pRB->szName] = create_publisher<geometry_msgs::msg::PoseStamped>(body_name+"/pose", rclcpp::QoS(1000));
-                // }
+                if(pub_rigid_body)
+                {
+                    ListRigidBodies[pRB->ID] = body_name;
+                    // RigidbodyPub[pRB->szName] = create_publisher<geometry_msgs::msg::PoseStamped>(body_name+"/pose", rclcpp::QoS(1000));
+                }
                 if ( pRB->MarkerPositions != NULL && pRB->MarkerRequiredLabels != NULL )
                 {
                     for ( int markerIdx = 0; markerIdx < pRB->nMarkers; ++markerIdx )
