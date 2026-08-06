@@ -12,6 +12,8 @@ import lifecycle_msgs.msg
 from launch.actions import EmitEvent
 from launch_ros.events.lifecycle import ChangeState
 from launch.events.matchers import matches_action
+from launch.actions import RegisterEventHandler
+from launch_ros.event_handlers import OnStateTransition
 
 def node_fn(context,*args, **kwargs):
     serverIP = LaunchConfiguration('serverIP')
@@ -81,14 +83,23 @@ def node_fn(context,*args, **kwargs):
         )
     )
     ld.append(driver_configure)
-    if activate.perform(context):
-        driver_activate = EmitEvent(
-        event=ChangeState(
-            lifecycle_node_matcher=matches_action(node),
-            transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
+    if activate.perform(context).lower() == "true":
+        ld.append(
+            RegisterEventHandler(
+                OnStateTransition(
+                    target_lifecycle_node=node,
+                    goal_state="inactive",
+                    entities=[
+                        EmitEvent(
+                            event=ChangeState(
+                                lifecycle_node_matcher=matches_action(node),
+                                transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
+                            )
+                        )
+                    ],
+                )
             )
         )
-        ld.append(driver_activate)
     
 
     return ld
